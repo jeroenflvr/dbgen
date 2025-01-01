@@ -80,9 +80,9 @@ def main():
     # Configuration Parameters
     DBGEN_STEPS = 10000          # Number of steps/chunks to generate
     SCALE_FACTOR = 3000        # Scale factor for dbgen
-    CHILDREN = 3000             # Number of children per parent in dbgen
+    CHILDREN = 2000             # Number of children per parent in dbgen
     STEP_START = 0            # Starting step number
-    OUTPUT_DIR = "/data/output/gen/sf3000"  # Directory to save Parquet files
+    OUTPUT_DIR = "/home/jeroen/data/gen/sf3000"  # Directory to save Parquet files
     OUTPUT_PREFIX = "gen/sf3000_s3"
     BUCKET = "output"
     DUCKDB_DATABASE = ":memory:"    # Use ':memory:' for in-memory DB or provide a file path
