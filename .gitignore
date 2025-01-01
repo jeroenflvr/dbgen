@@ -1,1 +1,4 @@
 venv/
+nohup.out
+parts_gen.log
+s3proxy.properties
