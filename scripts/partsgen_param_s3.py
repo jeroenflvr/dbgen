@@ -51,11 +51,9 @@ def export_tables_to_parquet(conn: duckdb.DuckDBPyConnection,
             output_path: str):
 
     for table in tables:
-        # check_or_create_table_dir(table, output_path)
         parquet_file = os.path.join(
             output_path, table, f"{table}_{str(step).zfill(7)}.parquet"
         )
-
 
         try:
             logging.info(f"Exporting table '{table}' to '{parquet_file}'...")
@@ -69,18 +67,6 @@ def process_part_test(part: int, chunks: int, sf: int, output_dir: str) -> None:
     logging.info(f"processing part {part} out of {chunks} and saving to {output_dir}")
 
 
-# async def run_blocking_process_part(step, chunks, sf, output_dir):
-#     try:
-#         result = await asyncio.to_thread(process_part, step, chunks, sf, output_dir)
-#         return result
-#     except asyncio.CancelledError:
-#         print(f"Task {step}: Was canceled.")
-#         raise 
-#     except Exception as e:
-#         print(f"Task {step}: Encountered an exception - {e}")
-#         return e  
-
-
 
 def process_part(step: int, chunks: int, sf: int, output_location: str,
                  s3_key_id: str, s3_secret_key: str, s3_endpoint: str) -> None:
@@ -89,7 +75,6 @@ def process_part(step: int, chunks: int, sf: int, output_location: str,
         ":memory:"
     )
 
-    # os.makedirs(output_dir, exist_ok=True)
     logging.info(f"Parquet files will be saved to '{output_location}' (in table dir).")
 
     try:
@@ -237,10 +222,11 @@ async def main():
         ]
 
 
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        errors = await asyncio.gather(*tasks, return_exceptions=True)
 
-
-    print(f"{results=}")
+        for e in errors: 
+            if e:
+                logging.error(f"Errors happended:\n{errors=}")
 
     logging.info("Data generation and export process completed.")
 
