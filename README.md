@@ -30,7 +30,7 @@ Start with scale factor 1, 3 and 10 and work your way up to 3000.
 
 Find the balance between scaling up and scaling out: less processes = more memory, more processes = more overhead.  
 
-WARNING: Too many processes will trigger segfaults.  I guess duckdb and C++ have their limits on thread safety.  On a machine with 36 cores/72 threads, 35 processes has been consistently stable.  So ymmv, but #cores - 1 seems golden.  Duckdb will use all of the available cores for each process, so expect scheduling overhead.
+WARNING: Too many processes will trigger segfaults.  I guess python, duckdb and C++ have their limits on thread safety.  On a machine with 36 cores/72 threads, 35 processes has been consistently stable.  So ymmv, but #cores - 1 seems golden.  Duckdb will use all of the available cores for each process, so expect scheduling overhead.
 
 
 For more information, see this [duckdb extension doc](https://duckdb.org/docs/extensions/tpch) and this [TPC-H paper](https://www.tpc.org/tpch/).
@@ -38,7 +38,7 @@ For more information, see this [duckdb extension doc](https://duckdb.org/docs/ex
 I recommend using [btop](https://github.com/aristocratos/btop) for realtime monitoring your hardware, but [glances](https://github.com/nicolargo/glances), [htop](https://github.com/htop-dev/htop), classic top and sar, [xymon](https://www.xymon.com/), .. of course will work equally well.
 
 
-There is a "local" version as well as an s3 compatible one.  You decide.
+There is a "local" version as well as an s3 compatible one.
 ### local
 ```shell
 (venv) $ python scripts/partsgen_param.py --help
@@ -80,13 +80,28 @@ options:
 # example
 running sf 1000
 
-```shell
-(venv) jeroen@biggie:~/projects/dbgen$ time python scripts/partsgen_param.py --sf 1000 --parts 1000 --output /home/moi/data/gen1000 --concurrency 35
-2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/jeroen/data/gen1000' (in table dir).
-2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/jeroen/data/gen1000' (in table dir).
-2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/jeroen/data/gen1000' (in table dir).
+hardware: dual E5-2699 v3 Xeon, 128GB DDR4 2100MHz RAM, WD Blue SN580 NVMe 2TB SSD Drive on PCIx gen3
 
+```shell
+(venv) $ time python scripts/partsgen_param.py --sf 1000 --parts 1000 --output /home/thisguy/data/gen1000 --concurrency 35
+2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/thisguy/data/gen1000' (in table dir).
+2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/thisguy/data/gen1000' (in table dir).
+2025-01-04 00:34:23,537 [INFO] Parquet files will be saved to '/home/thisguy/data/gen1000' (in table dir).
+...
+(a few moments later)
+...
+2025-01-04 00:49:36,098 [INFO] Data generation and export process completed.
+
+real    15m12.960s
+user    948m4.294s
+sys     78m7.294s
+(venv) $
 ```
 
-yielding this load
+yielding this load:
 
+![scale factor 1000](btop_dump_sf1000.png "scale factor 1000 with 1000 partitions")
+
+
+The workstation I found on ebay had some hardware reconfiguring to avoid permanent damage:
+![bad hardware setup](btop_load_bad_cooling.png "BAD hardware configuration with air short-circuit")
