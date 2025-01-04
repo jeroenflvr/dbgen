@@ -2,10 +2,9 @@
 
 Standalone partitioned version of duckdb's TPC-H decision-making benchmark dataset generation.  It's basically a wrapper around duckdb's ```dbgen(sf, children, step)```, which is a wrapper around the [TPC-H standalone dbgen tool](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp).
 
-This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler, prometheus and grafana.  For that, I needed datasets stored in multiple parquet files rather than just 1 file, and duckdb just happens to have this built-in.  For just generating the data, have a look at the [tpc-h standalone dbgen tool](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp).  Duckdb has a python package, supports splitting the workload in parts as well, knows parquet and s3.  This keeps things extremely simple while still ticking all the boxes.
+I need data for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler, prometheus and grafana.  The datasets have to be stored in multiple parquet files rather than just 1 file, and duckdb just happens to have this built-in.  For just generating the data, take a look at the [tpc-h standalone dbgen tool](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp).  Duckdb has a python package, supports splitting the workload in parts, and knows parquet and s3.  This keeps things extremely simple while still ticking all the boxes.
 
 This is not the real benchmark.  It generates the data required for the benchmarks.  However, generating the data does stress the system pretty hard.
-
 
 I have a distributed version using ray, but here, for simplicity and if you have the patience and hardware, we're using asyncio and ProcessPoolExecutor with reusable workers (which easily translates to ie. remote [ray](https://github.com/dmatrix/ray-core-tutorial) workers).
 
