@@ -1,6 +1,6 @@
 # dbgen
 
-Standalone partitioned version of duckdb's TPC-H decision-making benchmark dataset generation.  It's basically a wrapper around duckdb's ```dbgen(sf, children, step)```.
+Standalone partitioned version of duckdb's TPC-H decision-making benchmark dataset generation.  It's basically a wrapper around duckdb's ```dbgen(sf, children, step)```, which is a wrapper around the [TPC-H standalone dbgen tool](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp).
 
 This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler, prometheus and grafana.  For that, I needed datasets stored in multiple parquet files rather than just 1 file, and duckdb just happens to have this built-in.  For just generating the data, have a look at the [tpc-h standalone dbgen tool](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp).  Duckdb has a python package, supports splitting the workload in parts as well, knows parquet and s3.  This keeps things extremely simple while still ticking all the boxes.
 
