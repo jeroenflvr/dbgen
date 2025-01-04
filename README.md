@@ -15,12 +15,12 @@ Using python, obviously, you'l need to install duckdb with the following prereqs
 TIP: save yourself some time and use [uv](https://docs.astral.sh/uv/) to install the above in a virtual environment.
 
 ```shell
-$ uv pip install -r requirements.txt 
+(venv) $ uv pip install -r requirements.txt 
 Resolved 2 packages in 107ms
 Installed 2 packages in 11ms
  + asyncio==3.4.3
  + duckdb==1.1.3
-$
+(venv) $
 ```
 
 # gist
