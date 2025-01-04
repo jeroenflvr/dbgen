@@ -103,5 +103,5 @@ yielding this load:
 ![scale factor 1000](btop_dump_sf1000.png "scale factor 1000 with 1000 partitions")
 
 
-The workstation I found on ebay had some hardware reconfiguring to avoid permanent damage:
+The workstation I found on ebay needed some hardware reconfiguring to avoid permanent damage:
 ![bad hardware setup](btop_load_bad_cooling.png "BAD hardware configuration with air short-circuit")
