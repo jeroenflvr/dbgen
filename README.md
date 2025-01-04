@@ -2,7 +2,7 @@
 
 Standalone partitioned version of duckdb's TPC-H decision-making benchmark dataset generation.  It's basically a wrapper around duckdb's ```dbgen(sf, children, step)```.
 
-This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with prometheus and grafana.
+This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler , prometheus and grafana.  For that, I needed datasets stored in multiple parquet files rather than just 1 file.
 
 
 I also have distributed versions with ray, ballista, rust/arrow and spark, which I'll add soon. Here, for simplicity and if you have the patience and hardware, we're using asyncio and ProcessPoolExecutor with reusable workers (which easily translates to ie. remote [ray](https://github.com/dmatrix/ray-core-tutorial) workers).
