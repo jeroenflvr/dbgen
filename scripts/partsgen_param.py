@@ -231,21 +231,19 @@ async def main():
     args = parser.parse_args()
 
 
-    SCALE_FACTOR = args.sf
-    CHILDREN = args.parts
+    scale_factor = args.sf
+    children = args.parts
     STEP_START = 0
-    CONCURRENCY = args.concurrency
-    OUTPUT_DIR = (
-        args.output
-    )
+    concurrency = args.concurrency
+    output_dir = args.output
 
 
-    max_workers = CONCURRENCY  
+    max_workers = concurrency  
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         loop = asyncio.get_running_loop()
         tasks = [
-            loop.run_in_executor(executor, process_part, step, CHILDREN, SCALE_FACTOR, OUTPUT_DIR)
-            for step in range(STEP_START, CHILDREN)
+            loop.run_in_executor(executor, process_part, step, children, scale_factor, output_dir)
+            for step in range(STEP_START, children)
         ]
 
 
