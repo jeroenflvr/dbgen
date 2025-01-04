@@ -2,7 +2,7 @@
 
 Standalone partitioned version of duckdb's TPC-H decision-making benchmark dataset generation.  It's basically a wrapper around duckdb's ```dbgen(sf, children, step)```.
 
-This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler , prometheus and grafana.  For that, I needed datasets stored in multiple parquet files rather than just 1 file.
+This is a prereq for further benchmarking different frameworks, for which I'm building a benchmarking framework with a runner/scheduler, prometheus and grafana.  For that, I needed datasets stored in multiple parquet files rather than just 1 file.
 
 
 I also have distributed versions with ray, ballista, rust/arrow and spark, which I'll add soon. Here, for simplicity and if you have the patience and hardware, we're using asyncio and ProcessPoolExecutor with reusable workers (which easily translates to ie. remote [ray](https://github.com/dmatrix/ray-core-tutorial) workers).
@@ -31,15 +31,17 @@ Start with scale factor 1, 3 and 10 and work your way up to 3000.
 Find the balance between scaling up and scaling out: less processes = more memory usage, more processes = more overhead. 
 A 1/1 ratio for scaling factor/partitions worked pretty well, but I expect to further dynamically tune based on performance/hardware with the benchmarking framework later.
 
-WARNING: Too many processes will trigger segfaults.  I guess python, duckdb and C++ have their limits on thread safety.  On a machine with 36 cores/72 threads, 35 processes has been consistently stable.  So ymmv, but #cores - 1 seems golden.  Duckdb will use all of the available cores for each process, so expect scheduling overhead.
+For concurrency, start with the number of cores, minus 1. On a machine with 36 cores/72 threads, 35 processes has been consistently stable. 
+WARNING: Too many processes will trigger segfaults.  I guess python, duckdb and C++ have their limits on thread safety.  Duckdb will use all of the available virtual cores for each process, so expect scheduling overhead.  
 
+Find the balance so the cpu and memory stay as close to 100% as possible, without stalling the system.
 
 For more information, see this [duckdb extension doc](https://duckdb.org/docs/extensions/tpch) and this [TPC-H paper](https://www.tpc.org/tpch/).
 
 I recommend using [btop](https://github.com/aristocratos/btop) for realtime monitoring your hardware, but [glances](https://github.com/nicolargo/glances), [htop](https://github.com/htop-dev/htop), classic top and sar, [xymon](https://www.xymon.com/), .. of course will work equally well.
 
 
-There is a "local" version as well as an s3 compatible one.
+There is a local version, as well as an s3 compatible one.
 ### local
 ```shell
 (venv) $ python scripts/partsgen_param.py --help
