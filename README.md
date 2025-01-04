@@ -33,7 +33,10 @@ Find the balance between scaling up and scaling out: less processes = more memor
 A 1/1 ratio for scaling factor/partitions worked pretty well, but I expect to further dynamically tune based on performance/hardware with the benchmarking framework later.
 
 For concurrency, start with the number of cores, minus 1. On a machine with 36 cores/72 threads, 35 processes has been consistently stable. 
-WARNING: Too many processes will trigger segfaults.  I guess python, duckdb and C++ have their limits on thread safety.  Duckdb will use all of the available virtual cores for each process, so expect scheduling overhead.  
+
+> [!WARNING]
+> Too many processes will trigger segfaults.  
+> I guess python, duckdb and C++ have their limits on thread safety.  Duckdb will use all of the available virtual cores for each process, so expect scheduling overhead.  
 
 Find the balance so the cpu and memory stay as close to 100% as possible, without stalling the system.
 
