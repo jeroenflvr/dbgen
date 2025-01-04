@@ -43,7 +43,7 @@ For more information, see this [duckdb extension doc](https://duckdb.org/docs/ex
 I recommend using [btop](https://github.com/aristocratos/btop) for realtime monitoring your hardware, but [glances](https://github.com/nicolargo/glances), [htop](https://github.com/htop-dev/htop), classic top and sar, [xymon](https://www.xymon.com/), .. of course will work equally well.
 
 
-There is a local version, as well as an s3 compatible one.
+There is a local version, as well as an s3 compatible one, which I'll merge into 1 later.
 ### local
 ```shell
 (venv) $ python scripts/partsgen_param.py --help
