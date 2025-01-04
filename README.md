@@ -28,7 +28,8 @@ Define a scale factor, choose the number of partitions, number of worker process
 
 Start with scale factor 1, 3 and 10 and work your way up to 3000.
 
-Find the balance between scaling up and scaling out: less processes = more memory, more processes = more overhead.  
+Find the balance between scaling up and scaling out: less processes = more memory usage, more processes = more overhead. 
+A 1/1 ratio for scaling factor/partitions worked pretty well, but I expect to further dynamically tune based on performance/hardware with the benchmarking framework later.
 
 WARNING: Too many processes will trigger segfaults.  I guess python, duckdb and C++ have their limits on thread safety.  On a machine with 36 cores/72 threads, 35 processes has been consistently stable.  So ymmv, but #cores - 1 seems golden.  Duckdb will use all of the available cores for each process, so expect scheduling overhead.
 
