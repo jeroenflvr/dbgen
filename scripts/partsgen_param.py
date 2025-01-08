@@ -9,12 +9,11 @@ from concurrent.futures import ProcessPoolExecutor
 log_file_path = "parts_gen.log"
 created_tables = []
 
-
-def setup_logging():
+def setup_logging() -> logging.Logger:
 
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-
+    logger.propagate = False
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
     console_handler = logging.StreamHandler(sys.stdout)
@@ -27,9 +26,12 @@ def setup_logging():
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
+    return logger
+
+logger = setup_logging()
 
 def check_or_create_table_dir(table: str, root: str) -> None:
-    if not table in created_tables:
+    if table not in created_tables:
         os.makedirs(os.path.join(root, table), exist_ok=True)
         created_tables.append(table)
 
@@ -54,7 +56,7 @@ def get_existing_tables(conn: duckdb.DuckDBPyConnection) -> set[duckdb.table]:
         tables = {row[0] for row in result}
         return tables
     except Exception as e:
-        logging.error(f"Error fetching tables: {e}")
+        logger.error(f"Error fetching tables: {e}")
         return set()
 
 
@@ -82,15 +84,15 @@ def export_tables_to_parquet(conn: duckdb.DuckDBPyConnection,
         )
 
         try:
-            logging.info(f"Exporting table '{table}' to '{parquet_file}'...")
+            logger.info(f"Exporting table '{table}' to '{parquet_file}'...")
             conn.execute(f"COPY {table} TO '{parquet_file}' (FORMAT 'parquet')")
-            logging.info(f"Successfully exported '{table}' to '{parquet_file}'.")
+            logger.info(f"Successfully exported '{table}' to '{parquet_file}'.")
         except Exception as e:
-            logging.error(f"Failed to export table '{table}': {e}")
+            logger.error(f"Failed to export table '{table}': {e}")
 
 
 def process_part_test(part: int, chunks: int, sf: int, output_dir: str) -> None:
-    logging.info(f"processing part {part} out of {chunks} and saving to {output_dir}")
+    logger.info(f"processing part {part} out of {chunks} and saving to {output_dir}")
 
 
 
@@ -120,57 +122,57 @@ def process_part(step: int, chunks: int, sf: int, output_dir: str) -> None:
     )
 
     os.makedirs(output_dir, exist_ok=True)
-    logging.info(f"Parquet files will be saved to '{output_dir}' (in table dir).")
+    logger.info(f"Parquet files will be saved to '{output_dir}' (in table dir).")
 
     try:
         conn = duckdb.connect(database=DUCKDB_DATABASE)
         conn.execute("load tpch;")
 
 
-        logging.info(f"Connected to DuckDB database '{DUCKDB_DATABASE}'.")
+        logger.info(f"Connected to DuckDB database '{DUCKDB_DATABASE}'.")
     except Exception as e:
-        logging.error(f"Failed to connect to DuckDB: {e}")
+        logger.error(f"Failed to connect to DuckDB: {e}")
         sys.exit(1)
     
     initial_tables = get_existing_tables(conn)
-    logging.info(f"Initial tables in the database: {initial_tables}")
+    logger.info(f"Initial tables in the database: {initial_tables}")
 
-    logging.info(f"=== Step {step} ===")
+    logger.info(f"=== Step {step} ===")
 
     try:
-        logging.info(
+        logger.info(
             f"STEP {step}: Generating data with dbgen (sf={sf}, children={chunks}, step={step})..."
         )
         conn.execute(
             f"CALL dbgen(sf={sf}, children={chunks}, step={step})"
         )
-        logging.info(f"STEP {step}: Data generation completed.")
+        logger.info(f"STEP {step}: Data generation completed.")
     except Exception as e:
-        logging.error(f"dbgen failed at step {step}: {e}")
+        logger.error(f"dbgen failed at step {step}: {e}")
         return
 
     current_tables = get_existing_tables(conn)
     new_tables = current_tables - initial_tables
     
     if not new_tables:
-        logging.warning(f"STEP {step}:  No new tables generated at step {step}.")
+        logger.warning(f"STEP {step}:  No new tables generated at step {step}.")
         return
-    logging.info(f"STEP {step}: New tables generated at step {step}: {new_tables}")
+    logger.info(f"STEP {step}: New tables generated at step {step}: {new_tables}")
 
     export_tables_to_parquet(conn, new_tables, step, output_dir)
 
     for table in new_tables:
         try:
             conn.execute(f"DROP TABLE IF EXISTS {table}")
-            logging.info(f"STEP {step}: Dropped table '{table}' after export.")
+            logger.info(f"STEP {step}: Dropped table '{table}' after export.")
         except Exception as e:
-            logging.error(f"STEP {step}: Failed to drop table '{table}': {e}")
+            logger.error(f"STEP {step}: Failed to drop table '{table}': {e}")
 
     try:
         conn.close()
-        logging.info(f"STEP {step}: Closed DuckDB connection.")
+        logger.info(f"STEP {step}: Closed DuckDB connection.")
     except Exception as e:
-        logging.error(f"STEP {step}: Error closing DuckDB connection: {e}")
+        logger.error(f"STEP {step}: Error closing DuckDB connection: {e}")
 
 
 async def main():
@@ -193,7 +195,9 @@ async def main():
     Returns:
         None
     """
-    setup_logging()
+    # logger = setup_logging()
+
+    logger.info("Starting data generation and export process...")
 
     parser = argparse.ArgumentParser(
         description="Generate TPC-H Benchmark parquet data using duckdb."
@@ -251,9 +255,9 @@ async def main():
 
         for e in errors: 
             if e:
-                logging.error(f"Errors happended:\n{errors=}")
+                logger.error(f"Errors happended:\n{errors=}")
 
-    logging.info("Data generation and export process completed.")
+    logger.info("Data generation and export process completed.")
 
 
 if __name__ == "__main__":
